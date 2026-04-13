@@ -78,8 +78,11 @@ void APlanePlayerController::MousePressed(const FInputActionValue& Value)
     bMouseControl = true;
 
     if (CachedPlane)
+    {
         CachedPlane->SetMouseControl(true);
         CachedPlane->StartCameraReset();
+    }
+    
 }
 
 void APlanePlayerController::MouseReleased(const FInputActionValue& Value)

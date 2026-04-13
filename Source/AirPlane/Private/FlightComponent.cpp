@@ -1,13 +1,27 @@
+// Kleith's Game
+
 #include "FlightComponent.h"
 #include "Components/StaticMeshComponent.h"
+
+UFlightComponent::UFlightComponent()
+{
+    PrimaryComponentTick.bCanEverTick = true;
+    PrimaryComponentTick.bStartWithTickEnabled = true;
+}
+
 
 void UFlightComponent::Initialize(UStaticMeshComponent* InMesh)
 {
     PlaneMesh = InMesh;
 }
 
-void UFlightComponent::TickComponent(float DeltaTime)
+void UFlightComponent::TickComponent(
+    float DeltaTime,
+    ELevelTick TickType,
+    FActorComponentTickFunction* ThisTickFunction)
 {
+    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
     if (!PlaneMesh) return;
 
     float TargetThrottle = FMath::Clamp(ThrottleInput, MaxReverseThrottle, MaxForwardThrottle);
@@ -75,8 +89,8 @@ void UFlightComponent::ApplyRotation(float DeltaTime)
     FVector Up = GetOwner()->GetActorUpVector();
 
    
-   PlaneMesh->AddTorqueInRadians(Right * (PitchInput * PitchSpeed * TorqueStrength));
-   PlaneMesh->AddTorqueInRadians(Forward * (RollInput * RollSpeed * TorqueStrength));
+   PlaneMesh->AddTorqueInRadians(-Right * (PitchInput * PitchSpeed * TorqueStrength));
+   PlaneMesh->AddTorqueInRadians(-Forward * (RollInput * RollSpeed * TorqueStrength));
 
    FVector AutoYaw = Up * (RollInput * AutoYawStrength * TorqueStrength);
    PlaneMesh->AddTorqueInRadians(AutoYaw);

@@ -1,3 +1,5 @@
+// Kleith's Game
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -12,9 +14,14 @@ class AIRPLANE_API UFlightComponent : public UActorComponent
     GENERATED_BODY()
 
 public:
+    UFlightComponent();
     void Initialize(UStaticMeshComponent* InMesh);
 
-    void TickComponent(float DeltaTime);
+    virtual void TickComponent(
+        float DeltaTime,
+        ELevelTick TickType,
+        FActorComponentTickFunction* ThisTickFunction
+    ) override;
 
     void SetThrottle(float Value);
     void SetYawInput(float Value);
@@ -41,7 +48,7 @@ private:
     float MaxReverseThrottle = -0.3f;
 
 
-    float ThrustPower = 50000.0f;
+    float ThrustPower = 300000.0f;
     float TurnSpeed = 60.0f;
     float PitchSpeed = 80.0f;
     float RollSpeed = 120.0f;

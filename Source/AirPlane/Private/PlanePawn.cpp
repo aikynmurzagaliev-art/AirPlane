@@ -1,3 +1,5 @@
+// Kleith's Game
+
 #include "PlanePawn.h"
 #include "Components/StaticMeshComponent.h"
 #include "FlightComponent.h"
@@ -49,27 +51,29 @@ void APlanePawn::Look(const FVector2D& LookAxis)
 void APlanePawn::StartCameraReset()
 {
     bReturningCamera = true;
+
 }
 
 void APlanePawn::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    FlightComponent->TickComponent(DeltaTime);
-
     if (bReturningCamera)
     {
-        FRotator Current = SpringArm->GetRelativeRotation();
-
-        FRotator Target = DefaultCameraRotation;
-
-        FRotator NewRot = FMath::RInterpTo(Current, Target, DeltaTime, 5.f);
-
-        SpringArm->SetRelativeRotation(NewRot);
-
-        if (Current.Equals(Target, 1.f))
+        if (AController* MyController = GetController())
         {
-            bReturningCamera = false;
+            FRotator Current = MyController->GetControlRotation();
+
+            FRotator Target = GetActorRotation();
+
+            FRotator NewRot = FMath::RInterpTo(Current, Target, DeltaTime, 5.f);
+
+            MyController->SetControlRotation(NewRot);
+
+            if (NewRot.Equals(Target, 1.f))
+            {
+                bReturningCamera = false;
+            }
         }
     }
 }
