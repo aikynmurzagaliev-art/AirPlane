@@ -38,7 +38,7 @@ private:
 
     APlanePawn* CachedPlane;
 
-    // Handlers
+
     void HandleThrottle(const struct FInputActionValue& Value);
     void HandleTurn(const struct FInputActionValue& Value);
     void HandleLook(const struct FInputActionValue& Value);

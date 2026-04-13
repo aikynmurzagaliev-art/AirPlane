@@ -36,7 +36,6 @@ void APlanePlayerController::SetupInputComponent()
     }
 }
 
-
 void APlanePlayerController::HandleThrottle(const FInputActionValue& Value)
 {
     if (CachedPlane)
@@ -51,8 +50,13 @@ void APlanePlayerController::HandleTurn(const FInputActionValue& Value)
 
 void APlanePlayerController::HandleLook(const FInputActionValue& Value)
 {
+    FVector2D Look = Value.Get<FVector2D>();
+
     if (CachedPlane)
-        CachedPlane->SetPitchInput(Value.Get<float>());
+    {
+        CachedPlane->SetPitchInput(Look.Y);
+        CachedPlane->SetRollInput(Look.X);
+    }
 }
 
 void APlanePlayerController::MousePressed(const FInputActionValue& Value)
