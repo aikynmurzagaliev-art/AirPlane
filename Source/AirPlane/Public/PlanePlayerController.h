@@ -38,6 +38,8 @@ private:
 
     APlanePawn* CachedPlane;
 
+    bool bMouseControl = false;
+
 
     void HandleThrottle(const struct FInputActionValue& Value);
     void HandleTurn(const struct FInputActionValue& Value);

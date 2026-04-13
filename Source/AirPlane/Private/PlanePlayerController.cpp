@@ -28,7 +28,11 @@ void APlanePlayerController::SetupInputComponent()
     if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
     {
         EIC->BindAction(IA_Throttle, ETriggerEvent::Triggered, this, &APlanePlayerController::HandleThrottle);
+        EIC->BindAction(IA_Throttle, ETriggerEvent::Completed, this, &APlanePlayerController::HandleThrottle);
+
         EIC->BindAction(IA_Turn, ETriggerEvent::Triggered, this, &APlanePlayerController::HandleTurn);
+        EIC->BindAction(IA_Turn, ETriggerEvent::Completed, this, &APlanePlayerController::HandleTurn);
+
         EIC->BindAction(IA_Look, ETriggerEvent::Triggered, this, &APlanePlayerController::HandleLook);
 
         EIC->BindAction(IA_MouseControl, ETriggerEvent::Started, this, &APlanePlayerController::MousePressed);
@@ -52,21 +56,40 @@ void APlanePlayerController::HandleLook(const FInputActionValue& Value)
 {
     FVector2D Look = Value.Get<FVector2D>();
 
-    if (CachedPlane)
+    if (bMouseControl)
+    { 
+        if (CachedPlane)
+        {
+            CachedPlane->SetPitchInput(Look.Y);
+            CachedPlane->SetRollInput(Look.X);
+        }
+    }
+    else
     {
-        CachedPlane->SetPitchInput(Look.Y);
-        CachedPlane->SetRollInput(Look.X);
+        if (CachedPlane)
+        {
+            CachedPlane->Look(Look);
+        }
     }
 }
 
 void APlanePlayerController::MousePressed(const FInputActionValue& Value)
 {
+    bMouseControl = true;
+
     if (CachedPlane)
         CachedPlane->SetMouseControl(true);
+        CachedPlane->StartCameraReset();
 }
 
 void APlanePlayerController::MouseReleased(const FInputActionValue& Value)
 {
+    bMouseControl = false;
+
     if (CachedPlane)
+    {
         CachedPlane->SetMouseControl(false);
+        CachedPlane->SetPitchInput(0.f);
+        CachedPlane->SetRollInput(0.f);
+    }
 }
