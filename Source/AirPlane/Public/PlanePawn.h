@@ -7,9 +7,12 @@
 #include "PlanePawn.generated.h"
 
 class UStaticMeshComponent;
-class UFlightComponent;
 class USpringArmComponent;
 class UCameraComponent;
+
+class UFlightComponent;
+class UWeaponComponent;
+class UHealthComponent;
 
 UCLASS()
 class AIRPLANE_API APlanePawn : public APawn
@@ -30,6 +33,8 @@ public:
     void SetPitchInput(float Value);
     void SetRollInput(float Value);
     void SetMouseControl(bool bEnabled);
+    void SetFireInput();
+
 
 private:
     UPROPERTY(VisibleAnywhere)
@@ -43,6 +48,15 @@ private:
 
     UPROPERTY(VisibleAnywhere)
     UFlightComponent* FlightComponent;
+
+    UPROPERTY(VisibleAnywhere)
+    UWeaponComponent* WeaponComponent;
+
+    UPROPERTY(VisibleAnywhere)
+    UHealthComponent* HealthComponent;
+
+    UPROPERTY(VisibleAnywhere)
+    USceneComponent* MuzzlePoint;
 
     FRotator DefaultCameraRotation;
     bool bReturningCamera = false;

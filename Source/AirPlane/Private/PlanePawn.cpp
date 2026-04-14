@@ -3,6 +3,8 @@
 #include "PlanePawn.h"
 #include "Components/StaticMeshComponent.h"
 #include "FlightComponent.h"
+#include "WeaponComponent.h"
+#include "HealthComponent.h"
 #include "GameFramework\SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 
@@ -23,6 +25,11 @@ APlanePawn::APlanePawn()
     PlaneMesh->SetLinearDamping(0.2f);
 
     FlightComponent = CreateDefaultSubobject<UFlightComponent>(TEXT("FlightComponent"));
+    WeaponComponent = CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComponent"));
+    HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+
+    MuzzlePoint = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzlePoint"));
+    MuzzlePoint->SetupAttachment(PlaneMesh);
 
     SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
     SpringArm->SetupAttachment(RootComponent);
@@ -39,6 +46,7 @@ void APlanePawn::BeginPlay()
     Super::BeginPlay();
 
     FlightComponent->Initialize(PlaneMesh);
+    WeaponComponent->Initialize(PlaneMesh, MuzzlePoint);
     DefaultCameraRotation = SpringArm->GetRelativeRotation();
 }
 
@@ -101,4 +109,9 @@ void APlanePawn::SetRollInput(float Value)
 void APlanePawn::SetMouseControl(bool bEnabled)
 {
     FlightComponent->SetMouseControl(bEnabled);
+}
+
+void APlanePawn::SetFireInput()
+{
+    WeaponComponent->Fire();
 }

@@ -37,6 +37,9 @@ void APlanePlayerController::SetupInputComponent()
 
         EIC->BindAction(IA_MouseControl, ETriggerEvent::Started, this, &APlanePlayerController::MousePressed);
         EIC->BindAction(IA_MouseControl, ETriggerEvent::Completed, this, &APlanePlayerController::MouseReleased);
+
+        EIC->BindAction(IA_Fire, ETriggerEvent::Started, this, &APlanePlayerController::HandleFire);
+        EIC->BindAction(IA_Fire, ETriggerEvent::Completed, this, &APlanePlayerController::HandleFire);
     }
 }
 
@@ -95,4 +98,10 @@ void APlanePlayerController::MouseReleased(const FInputActionValue& Value)
         CachedPlane->SetPitchInput(0.f);
         CachedPlane->SetRollInput(0.f);
     }
+}
+
+void APlanePlayerController::HandleFire(const FInputActionValue& Value)
+{
+    if (CachedPlane)
+        CachedPlane->SetFireInput();
 }

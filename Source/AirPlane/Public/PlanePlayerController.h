@@ -36,6 +36,9 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Input")
     UInputAction* IA_MouseControl;
 
+    UPROPERTY(EditDefaultsOnly, Category = "Input")
+    UInputAction* IA_Fire;
+
     APlanePawn* CachedPlane;
 
     bool bMouseControl = false;
@@ -47,4 +50,6 @@ private:
 
     void MousePressed(const struct FInputActionValue& Value);
     void MouseReleased(const struct FInputActionValue& Value);
+
+    void HandleFire(const struct FInputActionValue& Value);
 };
