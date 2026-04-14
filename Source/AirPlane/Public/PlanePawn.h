@@ -7,6 +7,9 @@
 #include "PlanePawn.generated.h"
 
 class UStaticMeshComponent;
+class UFlightComponent;
+class USpringArmComponent;
+class UCameraComponent;
 
 UCLASS()
 class AIRPLANE_API APlanePawn : public APawn
@@ -19,35 +22,28 @@ public:
     virtual void Tick(float DeltaTime) override;
     virtual void BeginPlay() override;
 
+    void Look(const FVector2D& LookAxis);
+    void StartCameraReset();
+
     void SetThrottle(float Value);
     void SetYawInput(float Value);
     void SetPitchInput(float Value);
+    void SetRollInput(float Value);
     void SetMouseControl(bool bEnabled);
 
-protected:
+private:
+    UPROPERTY(VisibleAnywhere)
+    UCameraComponent* Camera;
+
+    UPROPERTY(VisibleAnywhere)
+    USpringArmComponent* SpringArm;
 
     UPROPERTY(VisibleAnywhere)
     UStaticMeshComponent* PlaneMesh;
 
-    float ThrottleInput;
-    float YawInput;
-    float PitchInput;
-    bool bMouseControl;
+    UPROPERTY(VisibleAnywhere)
+    UFlightComponent* FlightComponent;
 
-    UPROPERTY(EditAnywhere, Category = "Flight")
-    float ThrustPower = 500000.0f;
-
-    UPROPERTY(EditAnywhere, Category = "Flight")
-    float LiftCoefficient = 0.3f;
-
-    UPROPERTY(EditAnywhere, Category = "Flight")
-    float TurnSpeed = 60.0f;
-
-    UPROPERTY(EditAnywhere, Category = "Flight")
-    float PitchSpeed = 60.0f;
-
-private:
-
-    void ApplyForces(float DeltaTime);
-    void ApplyRotation(float DeltaTime);
+    FRotator DefaultCameraRotation;
+    bool bReturningCamera = false;
 };

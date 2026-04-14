@@ -1,92 +1,104 @@
 // Kleith's Game
 
-
 #include "PlanePawn.h"
 #include "Components/StaticMeshComponent.h"
+#include "FlightComponent.h"
+#include "GameFramework\SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
 
 APlanePawn::APlanePawn()
 {
     PrimaryActorTick.bCanEverTick = true;
+
+    bUseControllerRotationYaw = false;
+    bUseControllerRotationPitch = false;
+    bUseControllerRotationRoll = false;
 
     PlaneMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlaneMesh"));
     RootComponent = PlaneMesh;
 
     PlaneMesh->SetSimulatePhysics(true);
     PlaneMesh->SetEnableGravity(false);
+    PlaneMesh->SetAngularDamping(2.0f);
+    PlaneMesh->SetLinearDamping(0.2f);
 
-    ThrottleInput = 0.f;
-    YawInput = 0.f;
-    PitchInput = 0.f;
-    bMouseControl = false;
+    FlightComponent = CreateDefaultSubobject<UFlightComponent>(TEXT("FlightComponent"));
+
+    SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+    SpringArm->SetupAttachment(RootComponent);
+    SpringArm->TargetArmLength = 300.f;
+    SpringArm->bUsePawnControlRotation = true;
+
+    Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+    Camera->SetupAttachment(SpringArm);
+    Camera->bUsePawnControlRotation = false;
 }
 
 void APlanePawn::BeginPlay()
 {
     Super::BeginPlay();
+
+    FlightComponent->Initialize(PlaneMesh);
+    DefaultCameraRotation = SpringArm->GetRelativeRotation();
+}
+
+void APlanePawn::Look(const FVector2D& LookAxis)
+{
+    AddControllerYawInput(LookAxis.X);
+    AddControllerPitchInput(LookAxis.Y);
+}
+
+void APlanePawn::StartCameraReset()
+{
+    bReturningCamera = true;
+
 }
 
 void APlanePawn::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    ApplyForces(DeltaTime);
-    ApplyRotation(DeltaTime);
-}
+    if (bReturningCamera)
+    {
+        if (AController* MyController = GetController())
+        {
+            FRotator Current = MyController->GetControlRotation();
 
+            FRotator Target = GetActorRotation();
+
+            FRotator NewRot = FMath::RInterpTo(Current, Target, DeltaTime, 5.f);
+
+            MyController->SetControlRotation(NewRot);
+
+            if (NewRot.Equals(Target, 1.f))
+            {
+                bReturningCamera = false;
+            }
+        }
+    }
+}
 
 void APlanePawn::SetThrottle(float Value)
 {
-    ThrottleInput = Value;
+    FlightComponent->SetThrottle(Value);
 }
 
 void APlanePawn::SetYawInput(float Value)
 {
-    YawInput = Value;
+    FlightComponent->SetYawInput(Value);
 }
 
 void APlanePawn::SetPitchInput(float Value)
 {
-    PitchInput = Value;
+    FlightComponent->SetPitchInput(Value);
+}
+
+void APlanePawn::SetRollInput(float Value)
+{
+    FlightComponent->SetRollInput(Value);
 }
 
 void APlanePawn::SetMouseControl(bool bEnabled)
 {
-    bMouseControl = bEnabled;
+    FlightComponent->SetMouseControl(bEnabled);
 }
-
-//physic
-
-void APlanePawn::ApplyForces(float DeltaTime)
-{
-    FVector Forward = GetActorForwardVector();
-    FVector Velocity = PlaneMesh->GetComponentVelocity();
-
-    float Speed = Velocity.Size();
-
-    
-    FVector Thrust = Forward * ThrottleInput * ThrustPower;
-    PlaneMesh->AddForce(Thrust);
-
-    
-    float LiftForce = Speed * LiftCoefficient;
-    FVector Lift = FVector::UpVector * LiftForce;
-
-    PlaneMesh->AddForce(Lift);
-}
-
-void APlanePawn::ApplyRotation(float DeltaTime)
-{
-    
-    float Yaw = YawInput * TurnSpeed * DeltaTime;
-
-    
-    float Pitch = 0.f;
-    if (bMouseControl)
-    {
-        Pitch = PitchInput * PitchSpeed * DeltaTime;
-    }
-
-    FRotator DeltaRot = FRotator(Pitch, Yaw, 0.f);
-    PlaneMesh->AddLocalRotation(DeltaRot);
-}
-

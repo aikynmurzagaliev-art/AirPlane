@@ -38,7 +38,9 @@ private:
 
     APlanePawn* CachedPlane;
 
-    // Handlers
+    bool bMouseControl = false;
+
+
     void HandleThrottle(const struct FInputActionValue& Value);
     void HandleTurn(const struct FInputActionValue& Value);
     void HandleLook(const struct FInputActionValue& Value);

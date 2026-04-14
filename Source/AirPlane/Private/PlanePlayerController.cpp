@@ -28,14 +28,17 @@ void APlanePlayerController::SetupInputComponent()
     if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
     {
         EIC->BindAction(IA_Throttle, ETriggerEvent::Triggered, this, &APlanePlayerController::HandleThrottle);
+        EIC->BindAction(IA_Throttle, ETriggerEvent::Completed, this, &APlanePlayerController::HandleThrottle);
+
         EIC->BindAction(IA_Turn, ETriggerEvent::Triggered, this, &APlanePlayerController::HandleTurn);
+        EIC->BindAction(IA_Turn, ETriggerEvent::Completed, this, &APlanePlayerController::HandleTurn);
+
         EIC->BindAction(IA_Look, ETriggerEvent::Triggered, this, &APlanePlayerController::HandleLook);
 
         EIC->BindAction(IA_MouseControl, ETriggerEvent::Started, this, &APlanePlayerController::MousePressed);
         EIC->BindAction(IA_MouseControl, ETriggerEvent::Completed, this, &APlanePlayerController::MouseReleased);
     }
 }
-
 
 void APlanePlayerController::HandleThrottle(const FInputActionValue& Value)
 {
@@ -51,18 +54,45 @@ void APlanePlayerController::HandleTurn(const FInputActionValue& Value)
 
 void APlanePlayerController::HandleLook(const FInputActionValue& Value)
 {
-    if (CachedPlane)
-        CachedPlane->SetPitchInput(Value.Get<float>());
+    FVector2D Look = Value.Get<FVector2D>();
+
+    if (bMouseControl)
+    { 
+        if (CachedPlane)
+        {
+            CachedPlane->SetPitchInput(Look.Y);
+            CachedPlane->SetRollInput(Look.X);
+        }
+    }
+    else
+    {
+        if (CachedPlane)
+        {
+            CachedPlane->Look(Look);
+        }
+    }
 }
 
 void APlanePlayerController::MousePressed(const FInputActionValue& Value)
 {
+    bMouseControl = true;
+
     if (CachedPlane)
+    {
         CachedPlane->SetMouseControl(true);
+        CachedPlane->StartCameraReset();
+    }
+    
 }
 
 void APlanePlayerController::MouseReleased(const FInputActionValue& Value)
 {
+    bMouseControl = false;
+
     if (CachedPlane)
+    {
         CachedPlane->SetMouseControl(false);
+        CachedPlane->SetPitchInput(0.f);
+        CachedPlane->SetRollInput(0.f);
+    }
 }
