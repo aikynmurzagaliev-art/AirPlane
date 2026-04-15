@@ -27,13 +27,15 @@ public:
 
     void Look(const FVector2D& LookAxis);
     void StartCameraReset();
+    void StopCameraReset();
 
     void SetThrottle(float Value);
     void SetYawInput(float Value);
     void SetPitchInput(float Value);
     void SetRollInput(float Value);
     void SetMouseControl(bool bEnabled);
-    void SetFireInput();
+    void StartFireInput();
+    void StopFireInput();
 
 
 private:
@@ -56,8 +58,12 @@ private:
     UHealthComponent* HealthComponent;
 
     UPROPERTY(VisibleAnywhere)
-    USceneComponent* MuzzlePoint;
+    USceneComponent* LeftMuzzle;
 
-    FRotator DefaultCameraRotation;
+    UPROPERTY(VisibleAnywhere)
+    USceneComponent* RightMuzzle;
+
+
     bool bReturningCamera = false;
+
 };

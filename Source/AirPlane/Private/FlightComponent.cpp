@@ -89,12 +89,12 @@ void UFlightComponent::ApplyRotation(float DeltaTime)
     FVector Up = GetOwner()->GetActorUpVector();
 
    
-   PlaneMesh->AddTorqueInRadians(-Right * (PitchInput * PitchSpeed * TorqueStrength));
-   PlaneMesh->AddTorqueInRadians(-Forward * (RollInput * RollSpeed * TorqueStrength));
+    PlaneMesh->AddTorqueInRadians(-Right * (PitchInput * PitchSpeed * TorqueStrength));
+    PlaneMesh->AddTorqueInRadians(-Forward * (RollInput * RollSpeed * TorqueStrength));
 
-   FVector AutoYaw = Up * (RollInput * AutoYawStrength * TorqueStrength);
-   PlaneMesh->AddTorqueInRadians(AutoYaw);
-        
-   PlaneMesh->AddTorqueInRadians(Up * (YawInput * TurnSpeed * TorqueStrength));
+    FVector AutoYaw = Up * (RollInput * AutoYawStrength * TorqueStrength);
+    PlaneMesh->AddTorqueInRadians(AutoYaw);
+         
+    PlaneMesh->AddTorqueInRadians(Up * (YawInput * TurnSpeed * TorqueStrength));
     
 }

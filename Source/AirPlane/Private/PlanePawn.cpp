@@ -28,8 +28,11 @@ APlanePawn::APlanePawn()
     WeaponComponent = CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComponent"));
     HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
-    MuzzlePoint = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzlePoint"));
-    MuzzlePoint->SetupAttachment(PlaneMesh);
+    LeftMuzzle = CreateDefaultSubobject<USceneComponent>(TEXT("LeftMuzzle"));
+    LeftMuzzle->SetupAttachment(PlaneMesh);
+
+    RightMuzzle = CreateDefaultSubobject<USceneComponent>(TEXT("RightMuzzle"));
+    RightMuzzle->SetupAttachment(PlaneMesh);
 
     SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
     SpringArm->SetupAttachment(RootComponent);
@@ -46,8 +49,8 @@ void APlanePawn::BeginPlay()
     Super::BeginPlay();
 
     FlightComponent->Initialize(PlaneMesh);
-    WeaponComponent->Initialize(PlaneMesh, MuzzlePoint);
-    DefaultCameraRotation = SpringArm->GetRelativeRotation();
+    WeaponComponent->Initialize(PlaneMesh, {LeftMuzzle, RightMuzzle});
+    
 }
 
 void APlanePawn::Look(const FVector2D& LookAxis)
@@ -59,12 +62,19 @@ void APlanePawn::Look(const FVector2D& LookAxis)
 void APlanePawn::StartCameraReset()
 {
     bReturningCamera = true;
+    
+}
 
+void APlanePawn::StopCameraReset()
+{
+    bReturningCamera = false;
 }
 
 void APlanePawn::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+    
+
 
     if (bReturningCamera)
     {
@@ -77,11 +87,6 @@ void APlanePawn::Tick(float DeltaTime)
             FRotator NewRot = FMath::RInterpTo(Current, Target, DeltaTime, 5.f);
 
             MyController->SetControlRotation(NewRot);
-
-            if (NewRot.Equals(Target, 1.f))
-            {
-                bReturningCamera = false;
-            }
         }
     }
 }
@@ -111,7 +116,12 @@ void APlanePawn::SetMouseControl(bool bEnabled)
     FlightComponent->SetMouseControl(bEnabled);
 }
 
-void APlanePawn::SetFireInput()
+void APlanePawn::StartFireInput()
 {
-    WeaponComponent->Fire();
+    WeaponComponent->StartFire();
+}
+
+void APlanePawn::StopFireInput()
+{
+    WeaponComponent->StopFire();
 }

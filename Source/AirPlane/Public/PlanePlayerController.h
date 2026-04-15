@@ -51,5 +51,6 @@ private:
     void MousePressed(const struct FInputActionValue& Value);
     void MouseReleased(const struct FInputActionValue& Value);
 
-    void HandleFire(const struct FInputActionValue& Value);
+    void HandleStartFire(const struct FInputActionValue& Value);
+    void HandleStopFire(const struct FInputActionValue& Value);
 };

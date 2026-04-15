@@ -14,7 +14,7 @@ class AIRPLANE_API UWeaponComponent : public UActorComponent
 
 public:	
 	UWeaponComponent();
-	void Initialize(UStaticMeshComponent* InMesh, USceneComponent* InMuzzlePoint);
+	void Initialize(UStaticMeshComponent* InMesh, const TArray<USceneComponent*>& InMuzzles);
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction) override;
@@ -22,11 +22,24 @@ public:
 	virtual void BeginPlay() override;
 
 	void Fire();
+
+	void StartFire();
+	void StopFire();
+
 protected:
 
 	UStaticMeshComponent* PlaneMesh;
-	USceneComponent* MuzzlePoint;
+	TArray<USceneComponent*> MuzzlePoints;
+	FTimerHandle FireTimer;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	float Damage = 20.f;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	float FireRate = 0.1f;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	float Spread = 1.0f;
+
+	bool bIsFiring = false;
 };

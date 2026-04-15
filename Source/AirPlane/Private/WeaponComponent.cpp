@@ -2,6 +2,7 @@
 
 #include "WeaponComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
 
 UWeaponComponent::UWeaponComponent()
 {
@@ -11,10 +12,10 @@ UWeaponComponent::UWeaponComponent()
 	
 }
 
-void UWeaponComponent::Initialize(UStaticMeshComponent* InMesh, USceneComponent* InMuzzlePoint)
+void UWeaponComponent::Initialize(UStaticMeshComponent* InMesh, const TArray<USceneComponent*>& InMuzzles)
 {
 	PlaneMesh = InMesh;
-	MuzzlePoint = InMuzzlePoint;
+	MuzzlePoints = InMuzzles;
 }
 
 void UWeaponComponent::BeginPlay()
@@ -25,30 +26,71 @@ void UWeaponComponent::BeginPlay()
 
 void UWeaponComponent::Fire()
 {
-	if (!PlaneMesh) return;
-
-	FVector Start = MuzzlePoint->GetComponentLocation();
-	FVector Direction = PlaneMesh->GetForwardVector();
-	FVector End = Start + Direction * 10000;
-
-	FHitResult Hit;
-	GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility);
-
-	if (Hit.bBlockingHit)
+	for (USceneComponent* Muzzle : MuzzlePoints) 
 	{
-		AActor* HitActor = Hit.GetActor();
+		if (!PlaneMesh) return;
 
-		if(HitActor && HitActor != GetOwner())
+		FVector Start = Muzzle->GetComponentLocation();
+		FVector Direction = PlaneMesh->GetForwardVector();
+		Direction = FMath::VRandCone(Direction, FMath::DegreesToRadians(Spread));
+
+		FVector End = Start + Direction * 10000;
+
+		//debug
+		DrawDebugLine(
+			GetWorld(),
+			Start,
+			End,
+			FColor::Red,
+			false,
+			2.0f,
+			0,
+			2.0f
+		);
+
+		FHitResult Hit;
+		GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility);
+
+		if (Hit.bBlockingHit)
 		{
-			UGameplayStatics::ApplyDamage(
-				HitActor,
-				Damage,
-				GetOwner()->GetInstigatorController(),
-				GetOwner(),
-				UDamageType::StaticClass()
-			);
+			AActor* HitActor = Hit.GetActor();
+
+			if (HitActor && HitActor != GetOwner())
+			{
+				UGameplayStatics::ApplyDamage(
+					HitActor,
+					Damage,
+					GetOwner()->GetInstigatorController(),
+					GetOwner(),
+					UDamageType::StaticClass()
+				);
+			}
 		}
 	}
+}
+
+void UWeaponComponent::StartFire()
+{
+	if (bIsFiring) return;
+
+	bIsFiring = true;
+
+	Fire();
+
+	GetWorld()->GetTimerManager().SetTimer(
+		FireTimer,
+		this,
+		&UWeaponComponent::Fire,
+		FireRate,
+		true
+	);
+}
+
+void UWeaponComponent::StopFire()
+{
+	bIsFiring = false;
+
+	GetWorld()->GetTimerManager().ClearTimer(FireTimer);
 }
 
 

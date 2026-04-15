@@ -38,8 +38,8 @@ void APlanePlayerController::SetupInputComponent()
         EIC->BindAction(IA_MouseControl, ETriggerEvent::Started, this, &APlanePlayerController::MousePressed);
         EIC->BindAction(IA_MouseControl, ETriggerEvent::Completed, this, &APlanePlayerController::MouseReleased);
 
-        EIC->BindAction(IA_Fire, ETriggerEvent::Started, this, &APlanePlayerController::HandleFire);
-        EIC->BindAction(IA_Fire, ETriggerEvent::Completed, this, &APlanePlayerController::HandleFire);
+        EIC->BindAction(IA_Fire, ETriggerEvent::Started, this, &APlanePlayerController::HandleStartFire);
+        EIC->BindAction(IA_Fire, ETriggerEvent::Completed, this, &APlanePlayerController::HandleStopFire);
     }
 }
 
@@ -71,6 +71,7 @@ void APlanePlayerController::HandleLook(const FInputActionValue& Value)
     {
         if (CachedPlane)
         {
+            CachedPlane->StopCameraReset();
             CachedPlane->Look(Look);
         }
     }
@@ -100,8 +101,13 @@ void APlanePlayerController::MouseReleased(const FInputActionValue& Value)
     }
 }
 
-void APlanePlayerController::HandleFire(const FInputActionValue& Value)
+void APlanePlayerController::HandleStartFire(const FInputActionValue& Value)
 {
-    if (CachedPlane)
-        CachedPlane->SetFireInput();
+    if (CachedPlane) CachedPlane->StartFireInput();
 }
+
+void APlanePlayerController::HandleStopFire(const FInputActionValue& Value)
+{
+    if (CachedPlane) CachedPlane->StopFireInput();
+}
+
