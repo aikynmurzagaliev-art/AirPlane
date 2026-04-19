@@ -3,6 +3,8 @@
 #include "PlanePawn.h"
 #include "Components/StaticMeshComponent.h"
 #include "FlightComponent.h"
+#include "WeaponComponent.h"
+#include "HealthComponent.h"
 #include "GameFramework\SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 
@@ -18,11 +20,19 @@ APlanePawn::APlanePawn()
     RootComponent = PlaneMesh;
 
     PlaneMesh->SetSimulatePhysics(true);
-    PlaneMesh->SetEnableGravity(false);
+    PlaneMesh->SetEnableGravity(true);
     PlaneMesh->SetAngularDamping(2.0f);
     PlaneMesh->SetLinearDamping(0.2f);
 
     FlightComponent = CreateDefaultSubobject<UFlightComponent>(TEXT("FlightComponent"));
+    WeaponComponent = CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComponent"));
+    HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+
+    LeftMuzzle = CreateDefaultSubobject<USceneComponent>(TEXT("LeftMuzzle"));
+    LeftMuzzle->SetupAttachment(PlaneMesh);
+
+    RightMuzzle = CreateDefaultSubobject<USceneComponent>(TEXT("RightMuzzle"));
+    RightMuzzle->SetupAttachment(PlaneMesh);
 
     SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
     SpringArm->SetupAttachment(RootComponent);
@@ -39,7 +49,8 @@ void APlanePawn::BeginPlay()
     Super::BeginPlay();
 
     FlightComponent->Initialize(PlaneMesh);
-    DefaultCameraRotation = SpringArm->GetRelativeRotation();
+    WeaponComponent->Initialize(PlaneMesh, {LeftMuzzle, RightMuzzle});
+    
 }
 
 void APlanePawn::Look(const FVector2D& LookAxis)
@@ -51,31 +62,72 @@ void APlanePawn::Look(const FVector2D& LookAxis)
 void APlanePawn::StartCameraReset()
 {
     bReturningCamera = true;
-
+    
 }
+
+void APlanePawn::StopCameraReset()
+{
+    bReturningCamera = false;
+}
+
+void APlanePawn::FallowingCamera(float DeltaTime)
+{
+    if (AController* MyController = GetController())
+    {
+        FRotator Current = MyController->GetControlRotation();
+        FRotator Target = GetActorRotation();
+        FRotator NewRot = FMath::RInterpTo(Current, Target, DeltaTime, 5.f);
+
+        MyController->SetControlRotation(NewRot);
+    }
+}
+
+void APlanePawn::ResetViewOfCamera(float DeltaTime)
+{
+    FVector Velocity = GetVelocity();
+    float Speed = Velocity.Size();
+
+    float SpeedAlpha = FMath::Clamp(Speed / MaxSpeedForFOV, 0.f, 1.f);
+
+    float TargetFOV = FMath::Lerp(MinFOV, MaxFOV, SpeedAlpha);
+
+    float NewFOV = FMath::FInterpTo(Camera->FieldOfView, TargetFOV, DeltaTime, 5.f);
+
+    Camera->SetFieldOfView(NewFOV);
+}
+
+//void APlanePawn::ReturnCameraToHorizon(float DeltaTime)
+//{
+//    FRotator Current = SpringArm->GetComponentRotation();
+//    FRotator PlaneRot = GetActorRotation();
+//
+//    
+//    FRotator Target = FRotator(
+//        PlaneRot.Pitch,
+//        PlaneRot.Yaw,
+//        0.f
+//    );
+//
+//    FRotator NewRot = FMath::RInterpTo(Current, Target, DeltaTime, 2.0f);
+//
+//    SpringArm->SetWorldRotation(NewRot);
+//}
 
 void APlanePawn::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-
+    
     if (bReturningCamera)
     {
-        if (AController* MyController = GetController())
-        {
-            FRotator Current = MyController->GetControlRotation();
-
-            FRotator Target = GetActorRotation();
-
-            FRotator NewRot = FMath::RInterpTo(Current, Target, DeltaTime, 5.f);
-
-            MyController->SetControlRotation(NewRot);
-
-            if (NewRot.Equals(Target, 1.f))
-            {
-                bReturningCamera = false;
-            }
-        }
+        FallowingCamera(DeltaTime);
     }
+
+    ResetViewOfCamera(DeltaTime);
+
+    /*if(bHorizonCamera)
+    {
+        ReturnCameraToHorizon(DeltaTime);
+    }*/
 }
 
 void APlanePawn::SetThrottle(float Value)
@@ -101,4 +153,19 @@ void APlanePawn::SetRollInput(float Value)
 void APlanePawn::SetMouseControl(bool bEnabled)
 {
     FlightComponent->SetMouseControl(bEnabled);
+}
+
+void APlanePawn::StartFireInput()
+{
+    WeaponComponent->StartFire();
+}
+
+void APlanePawn::StopFireInput()
+{
+    WeaponComponent->StopFire();
+}
+
+void APlanePawn::SteerTowards(FVector Target)
+{
+
 }

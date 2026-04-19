@@ -44,6 +44,7 @@ void UFlightComponent::SetMouseControl(bool bEnabled) { bMouseControl = bEnabled
 
 void UFlightComponent::ApplyForces(float DeltaTime)
 {
+    //Thrust 
     FVector Forward = GetOwner()->GetActorForwardVector();
     FVector Velocity = PlaneMesh->GetComponentVelocity();
     float Speed = Velocity.Size();
@@ -57,6 +58,7 @@ void UFlightComponent::ApplyForces(float DeltaTime)
 
     PlaneMesh->AddForce(Thrust);
 
+    //Lift
     if (Speed < 10.f) return;
 
     FVector VelDir = Velocity.GetSafeNormal();
@@ -80,6 +82,13 @@ void UFlightComponent::ApplyForces(float DeltaTime)
 
     FVector Drag = -VelDir * Speed * Speed * DragCoefficient;
     PlaneMesh->AddForce(Drag);
+
+   
+    //turnThrust
+    FVector TurnForceDir = (Forward - VelDir).GetSafeNormal();
+    float TurnStrength = Speed * TurnForce;
+
+    PlaneMesh->AddForce(TurnForceDir * TurnStrength);
 }
 
 void UFlightComponent::ApplyRotation(float DeltaTime)
@@ -88,13 +97,13 @@ void UFlightComponent::ApplyRotation(float DeltaTime)
     FVector Right = GetOwner()->GetActorRightVector();
     FVector Up = GetOwner()->GetActorUpVector();
 
-   
-   PlaneMesh->AddTorqueInRadians(-Right * (PitchInput * PitchSpeed * TorqueStrength));
-   PlaneMesh->AddTorqueInRadians(-Forward * (RollInput * RollSpeed * TorqueStrength));
 
-   FVector AutoYaw = Up * (RollInput * AutoYawStrength * TorqueStrength);
-   PlaneMesh->AddTorqueInRadians(AutoYaw);
-        
-   PlaneMesh->AddTorqueInRadians(Up * (YawInput * TurnSpeed * TorqueStrength));
-    
+    PlaneMesh->AddTorqueInRadians(-Right * (PitchInput * PitchSpeed * TorqueStrength));
+    PlaneMesh->AddTorqueInRadians(-Forward * (RollInput * RollSpeed * TorqueStrength));
+
+    FVector AutoYaw = Up * (RollInput * AutoYawStrength * TorqueStrength);
+    PlaneMesh->AddTorqueInRadians(AutoYaw);
+
+    PlaneMesh->AddTorqueInRadians(Up * (YawInput * TurnSpeed * TorqueStrength));
+
 }
