@@ -46,7 +46,7 @@ private:
 
     float MaxForwardThrottle = 1.0f;
     float MaxReverseThrottle = -0.3f;
-    
+
     //Airplane settings
     UPROPERTY(EditAnywhere, Category = "AirPlane")
     float ThrustPower = 400000.0f;
@@ -68,6 +68,9 @@ private:
 
     UPROPERTY(EditAnywhere, Category = "AirPlane|Physics")
     float DragCoefficient = 0.6f;
+
+    UPROPERTY(EditAnywhere, Category = "AirPlane|Physics")
+    float TurnForce = 500.0f;
 
     UPROPERTY(EditAnywhere, Category = "AirPlane|Physics")
     float StallAngle = 25.0f;

@@ -28,6 +28,9 @@ public:
     void Look(const FVector2D& LookAxis);
     void StartCameraReset();
     void StopCameraReset();
+    void FallowingCamera(float DeltaTime);
+    void ResetViewOfCamera(float DeltaTime);
+    //void ReturnCameraToHorizon(float DeltaTime);
 
     void SetThrottle(float Value);
     void SetYawInput(float Value);
@@ -37,8 +40,11 @@ public:
     void StartFireInput();
     void StopFireInput();
 
+    //AI controller
+    void SteerTowards(FVector Target);
 
 private:
+    //components
     UPROPERTY(VisibleAnywhere)
     UCameraComponent* Camera;
 
@@ -64,6 +70,22 @@ private:
     USceneComponent* RightMuzzle;
 
 
-    bool bReturningCamera = false;
+    //variables
+     
+    UPROPERTY(EditAnywhere, Category = "Camera")
+    float MinFOV = 90.f;
 
+    UPROPERTY(EditAnywhere, Category = "Camera")
+    float MaxFOV = 110.f;
+
+    UPROPERTY(EditAnywhere, Category = "Camera")
+    float MaxSpeedForFOV = 6000.f;
+
+
+    FRotator DefaultRotation;
+
+    bool bReturningCamera = false;
+    bool bHorizonCamera = false;
+
+    
 };
