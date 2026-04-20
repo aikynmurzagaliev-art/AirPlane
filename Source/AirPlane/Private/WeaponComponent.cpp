@@ -3,6 +3,7 @@
 #include "WeaponComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
+#include "Projectile.h"
 
 UWeaponComponent::UWeaponComponent()
 {
@@ -26,46 +27,25 @@ void UWeaponComponent::BeginPlay()
 
 void UWeaponComponent::Fire()
 {
-	for (USceneComponent* Muzzle : MuzzlePoints) 
+	if (!ProjectileClass || !PlaneMesh) return;
+
+	FActorSpawnParameters Params;
+	Params.Owner = GetOwner();
+	Params.Instigator = Cast<APawn>(GetOwner());
+
+	for (USceneComponent* Muzzle : MuzzlePoints)
 	{
-		if (!PlaneMesh) return;
+		if (!Muzzle) continue;
 
-		FVector Start = Muzzle->GetComponentLocation();
-		FVector Direction = PlaneMesh->GetForwardVector();
-		Direction = FMath::VRandCone(Direction, FMath::DegreesToRadians(Spread));
+		FVector Location = Muzzle->GetComponentLocation();
+		FRotator Rotation = Muzzle->GetComponentRotation();
 
-		FVector End = Start + Direction * 10000;
-
-		//debug
-		DrawDebugLine(
-			GetWorld(),
-			Start,
-			End,
-			FColor::Red,
-			false,
-			2.0f,
-			0,
-			2.0f
+		GetWorld()->SpawnActor<AProjectile>(
+			ProjectileClass,
+			Location,
+			Rotation,
+			Params
 		);
-
-		FHitResult Hit;
-		GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility);
-
-		if (Hit.bBlockingHit)
-		{
-			AActor* HitActor = Hit.GetActor();
-
-			if (HitActor && HitActor != GetOwner())
-			{
-				UGameplayStatics::ApplyDamage(
-					HitActor,
-					Damage,
-					GetOwner()->GetInstigatorController(),
-					GetOwner(),
-					UDamageType::StaticClass()
-				);
-			}
-		}
 	}
 }
 

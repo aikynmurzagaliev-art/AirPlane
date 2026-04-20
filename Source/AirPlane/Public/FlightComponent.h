@@ -49,10 +49,10 @@ private:
 
     //Airplane settings
     UPROPERTY(EditAnywhere, Category = "AirPlane")
-    float ThrustPower = 400000.0f;
+    float ThrustPower = 10000000.0f;
 
     UPROPERTY(EditAnywhere, Category = "AirPlane")
-    float TurnSpeed = 80.0f;
+    float TurnSpeed = 200.0f;
 
     UPROPERTY(EditAnywhere, Category = "AirPlane")
     float PitchSpeed = 80.0f;
@@ -67,22 +67,22 @@ private:
     float LiftMultiplier = 0.05f;
 
     UPROPERTY(EditAnywhere, Category = "AirPlane|Physics")
-    float DragCoefficient = 0.6f;
+    float DragCoefficient = 0.01f;
 
     UPROPERTY(EditAnywhere, Category = "AirPlane|Physics")
-    float TurnForce = 500.0f;
+    float TurnForce = 1500.0f;
 
     UPROPERTY(EditAnywhere, Category = "AirPlane|Physics")
     float StallAngle = 25.0f;
 
     UPROPERTY(EditAnywhere, Category = "AirPlane|Physics")
-    float StallPenalty = 0.3f;
+    float StallPenalty = 1.f;
 
     UPROPERTY(EditAnywhere, Category = "AirPlane|Physics")
-    float MinSpeedForLift = 300.f;
+    float MinSpeedForLift = 600.0f;
 
     UPROPERTY(EditAnywhere, Category = "AirPlane|Physics")
-    float TorqueStrength = 500.f;
+    float TorqueStrength = 1000000.0f;
 
 private:
     void ApplyForces(float DeltaTime);

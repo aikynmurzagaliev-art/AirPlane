@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "WeaponComponent.generated.h"
 
+class AProjectile;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class AIRPLANE_API UWeaponComponent : public UActorComponent
@@ -33,7 +34,7 @@ protected:
 	FTimerHandle FireTimer;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
-	float Damage = 20.f;
+	TSubclassOf<AProjectile> ProjectileClass;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	float FireRate = 0.1f;
