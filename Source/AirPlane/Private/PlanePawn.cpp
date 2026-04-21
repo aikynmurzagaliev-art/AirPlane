@@ -167,5 +167,11 @@ void APlanePawn::StopFireInput()
 
 void APlanePawn::SteerTowards(FVector Target)
 {
+    FVector Direction = (Target - GetActorLocation()).GetSafeNormal();
 
+    FRotator TargetRot = Direction.Rotation();
+    FRotator NewRot = FMath::RInterpTo(GetActorRotation(), TargetRot, GetWorld()->DeltaTimeSeconds, 2.f);
+    SetActorRotation(NewRot);
+
+    FlightComponent->SetThrottle(1.f);
 }

@@ -36,7 +36,7 @@ protected:
 
 
 	UPROPERTY(EditAnywhere, Category = "BulletSettings")
-	float Speed = 20000.f;
+	float Speed = 50000.f;
 
 	UPROPERTY(EditAnywhere, Category = "BulletSettings")
 	float Damage = 20.f;

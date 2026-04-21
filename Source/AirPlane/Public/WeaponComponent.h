@@ -37,6 +37,9 @@ protected:
 	TSubclassOf<AProjectile> ProjectileClass;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
+	USoundBase* FireSound;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
 	float FireRate = 0.1f;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")

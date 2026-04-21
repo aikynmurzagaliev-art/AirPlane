@@ -29,6 +29,14 @@ void UWeaponComponent::Fire()
 {
 	if (!ProjectileClass || !PlaneMesh) return;
 
+	if(FireSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+			this, 
+			FireSound, 
+			GetOwner()->GetActorLocation());
+	}
+
 	FActorSpawnParameters Params;
 	Params.Owner = GetOwner();
 	Params.Instigator = Cast<APawn>(GetOwner());
