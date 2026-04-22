@@ -41,6 +41,7 @@ public:
     void StopFireInput();
 
     //AI controller
+    UFUNCTION(BlueprintCallable)
     void SteerTowards(FVector Target);
 
 private:

@@ -24,13 +24,9 @@ void APlaneAIController::BeginPlay()
 	Super::BeginPlay();
 
 	SetActorTickEnabled(true);
-	TargetLocation = FVector(0, 0, 1000);
 }
 
 void APlaneAIController::Tick(float DeltaTime)
 {
-	APlanePawn* PlanePawn = Cast<APlanePawn>(GetPawn());
-	if (!PlanePawn) return;
-
 }
 

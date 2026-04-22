@@ -30,5 +30,6 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	
 public:
+	UPROPERTY()
 	FVector TargetLocation;
 };
