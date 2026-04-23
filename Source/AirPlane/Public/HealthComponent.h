@@ -22,7 +22,10 @@ protected:
 	FOnDeath* OnDeath;
 
 	UPROPERTY(EditAnywhere, Category = "Health")
-	float MaxHealth;
+	USoundBase* DamageSound;
+
+	UPROPERTY(EditAnywhere, Category = "Health")
+	float MaxHealth = 100;
 
 	float CurrentHealth;
 

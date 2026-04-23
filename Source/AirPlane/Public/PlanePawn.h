@@ -14,6 +14,7 @@ class UFlightComponent;
 class UWeaponComponent;
 class UHealthComponent;
 
+
 UCLASS()
 class AIRPLANE_API APlanePawn : public APawn
 {
@@ -30,6 +31,7 @@ public:
     void StopCameraReset();
     void FallowingCamera(float DeltaTime);
     void ResetViewOfCamera(float DeltaTime);
+    void ResetAimPosition(float Deltatime);
     //void ReturnCameraToHorizon(float DeltaTime);
 
     void SetThrottle(float Value);
@@ -69,7 +71,6 @@ private:
 
     UPROPERTY(VisibleAnywhere)
     USceneComponent* RightMuzzle;
-
 
     //variables
      

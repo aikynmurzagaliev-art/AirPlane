@@ -1,6 +1,7 @@
 // Kleith's Game
 
 #include "HealthComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 UHealthComponent::UHealthComponent()
 {
@@ -27,6 +28,10 @@ void UHealthComponent::HandleTakeDamage(
 	AController* Instigator, 
 	AActor* DamageCauser)
 {
+	if(DamageSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, DamageSound, GetOwner()->GetActorLocation());
+	}
 	CurrentHealth -= Damage;
 
 	if (CurrentHealth <= 0.f) DamagedActor->Destroy();
