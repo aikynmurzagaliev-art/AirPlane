@@ -1,7 +1,8 @@
 ## Air Combat Prototype (UE5, C++)
 # Overview
 
-This project is a prototype of an air combat system developed in Unreal Engine 5 using C++ and Blueprints.
+Developed in Unreal Engine 5 using C++ and Blueprints.
+Air combat system prototype with player aircraft and AI enemies.
 
 # Features:
 1) Player-controlled aircraft with mouse-based steering
